@@ -5,20 +5,51 @@ using UnityEngine;
 public class Pooler : MonoBehaviour
 {
 
-    public GameObject poolingPrefab;
+    public static Pooler Instance;
+
+    public GameObject pooledPrefab;
 
     public int initialPoolingAmount;
-    public int maxAmount;
+     
+    public bool isExpandable = false;
 
-    private List<GameObject> pooledObjects;
+    private List<GameObject> pooledObjects = new List<GameObject>();
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    private void Start()
+    {
+        for (int i = 0; i < initialPoolingAmount; i++)
+        {
+            GameObject pooledObject = Instantiate(pooledPrefab) as GameObject;
+            pooledObject.SetActive(false);
+            pooledObjects.Add(pooledObject);
+        }
+    }
 
     public GameObject Get()
     {
-        return null;
-    }
+        foreach (GameObject pooledObject in pooledObjects)
+        {
+            if (!pooledObject.activeSelf)
+            {
+                return pooledObject;
+            }
+        }
 
-    public GameObject Eat()
-    {
-        return null;
+        if (isExpandable)
+        {
+            GameObject newPooledObject = Instantiate(pooledPrefab) as GameObject;
+            newPooledObject.SetActive(false);
+            pooledObjects.Add(newPooledObject);
+            return newPooledObject;
+        }
+        else
+        {
+            return null;
+        }
     }
 }
